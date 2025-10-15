@@ -1,0 +1,44 @@
+import { NextResponse } from 'next/server'
+import { createServerClient } from '@/supabase/supabaseClient'
+
+export async function POST(request: Request) {
+  try {
+    const body = await request.json()
+    const admin = createServerClient()
+    const { data, error } = await admin.from('promotions').insert(body).select('*').single()
+    if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+    return NextResponse.json({ promotion: data })
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message || 'Failed to create promotion' }, { status: 500 })
+  }
+}
+
+export async function PUT(request: Request) {
+  try {
+    const body = await request.json()
+    const { id, ...updates } = body || {}
+    if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
+    const admin = createServerClient()
+    const { data, error } = await admin.from('promotions').update({ ...updates, updated_at: new Date().toISOString() }).eq('id', id).select('*').single()
+    if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+    return NextResponse.json({ promotion: data })
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message || 'Failed to update promotion' }, { status: 500 })
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get('id')
+    if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
+    const admin = createServerClient()
+    const { error } = await admin.from('promotions').delete().eq('id', id)
+    if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+    return NextResponse.json({ success: true })
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message || 'Failed to delete promotion' }, { status: 500 })
+  }
+}
+
+
