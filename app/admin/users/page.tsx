@@ -50,7 +50,12 @@ export default function AdminUsersPage() {
       setError(null);
 
       // Prefer server list (Auth Admin) so newly created auth users appear immediately
-      const res = await fetch('/api/admin/users', { cache: 'no-store' });
+      const res = await fetch('/api/admin/users', { 
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || 'Failed to fetch users');
       setUsers(json.users || []);
@@ -195,15 +200,17 @@ export default function AdminUsersPage() {
 
     try {
       setError(null);
-      const res = await fetch(`/api/admin/users/delete?id=${deletingUser.id}`, { method: 'DELETE' })
+      const res = await fetch(`/api/admin/users/delete?id=${deletingUser.id}`, { method: 'DELETE', cache: 'no-store' })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Failed to delete user')
 
       setSuccessMessage('User deleted successfully.');
       setShowDeleteModal(false);
       setDeletingUser(null);
-      fetchUsers();
-
+      
+      // 강제 새로고침 (캐시 무시)
+      await fetchUsers();
+      
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err: any) {
       setError('Failed to delete user.');

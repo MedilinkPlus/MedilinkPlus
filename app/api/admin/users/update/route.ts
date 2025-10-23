@@ -1,42 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerClient } from '@/supabase/supabaseClient'
 
-export async function POST(request: Request) {
-  try {
-    const body = await request.json()
-    const { id, name, role, status } = body || {}
-    if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
-
-    const admin = createServerClient()
-
-    // 1) Update profile first
-    const updates: any = {}
-    if (name !== undefined) updates.name = name
-    if (role !== undefined) updates.role = String(role).toLowerCase()
-    if (status !== undefined) updates.status = String(status).toLowerCase()
-
-    if (Object.keys(updates).length) {
-      const { error: profErr } = await admin.from('profiles').update(updates).eq('id', id)
-      if (profErr) return NextResponse.json({ error: profErr.message }, { status: 400 })
-    }
-
-    // 2) Sync role to auth metadata if provided
-    if (role !== undefined) {
-      const { error: authErr } = await admin.auth.admin.updateUserById(id, {
-        user_metadata: { role: String(role).toLowerCase() }
-      } as any)
-      if (authErr) return NextResponse.json({ error: authErr.message }, { status: 400 })
-    }
-
-    return NextResponse.json({ success: true })
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message || 'Failed to update user' }, { status: 500 })
-  }
-}
-
-import { NextResponse } from 'next/server'
-import { createServerClient } from '@/supabase/supabaseClient'
-
 type UpdatePayload = {
   id: string
   name?: string
@@ -84,8 +48,8 @@ export async function POST(request: Request) {
     if (typeof role === 'string') updates.role = role
     if (Object.keys(updates).length > 0) {
       updates.updated_at = new Date().toISOString()
-      const { data, error: updErr } = await admin
-        .from('users')
+      const { data, error: updErr } = await (admin
+        .from('users') as any)
         .update(updates)
         .eq('id', id)
         .select()

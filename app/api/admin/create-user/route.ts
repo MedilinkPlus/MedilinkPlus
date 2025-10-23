@@ -25,8 +25,8 @@ export async function POST(request: Request) {
       if (existing) {
         // Ensure profile exists and return
         try {
-          await admin
-            .from('profiles')
+          await (admin
+            .from('profiles') as any)
             .upsert({ 
               id: existing.id, 
               email, 
@@ -60,8 +60,8 @@ export async function POST(request: Request) {
 
     // Ensure app profile exists immediately (idempotent)
     try {
-      await admin
-        .from('profiles')
+      await (admin
+        .from('profiles') as any)
         .upsert({
           id: data.user?.id,
           email,

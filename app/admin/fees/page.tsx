@@ -26,11 +26,10 @@ export default function AdminFeesPage() {
   const [editForm, setEditForm] = useState<Partial<Fee>>({
     hospital_id: '',
     department: '',
-    treatment_name: '',
+    treatment: null,
     min_price: 0,
     max_price: 0,
-    currency: 'USD',
-    unit: ''
+    currency: 'USD'
   });
 
   useEffect(() => {
@@ -76,11 +75,10 @@ export default function AdminFeesPage() {
     setEditForm({
       hospital_id: fee.hospital_id || '',
       department: fee.department || '',
-      treatment_name: fee.treatment_name || '',
+      treatment: fee.treatment || null,
       min_price: fee.min_price || 0,
       max_price: fee.max_price || 0,
-      currency: fee.currency || 'USD',
-      unit: fee.unit || ''
+      currency: fee.currency || 'USD'
     });
   };
 
@@ -92,11 +90,10 @@ export default function AdminFeesPage() {
       await FeeService.update(editingFee, {
         hospital_id: editForm.hospital_id!,
         department: editForm.department,
-        treatment_name: editForm.treatment_name!,
+        treatment: editForm.treatment,
         min_price: editForm.min_price!,
         max_price: editForm.max_price,
-        currency: editForm.currency!,
-        unit: editForm.unit
+        currency: editForm.currency!
       });
 
       setSuccessMessage('Fee information updated successfully.');
@@ -135,22 +132,20 @@ export default function AdminFeesPage() {
       await FeeService.create({
         hospital_id: editForm.hospital_id!,
         department: editForm.department,
-        treatment_name: editForm.treatment_name!,
+        treatment: editForm.treatment!,
         min_price: editForm.min_price!,
         max_price: editForm.max_price,
-        currency: editForm.currency!,
-        unit: editForm.unit
+        currency: editForm.currency!
       });
 
       setSuccessMessage('New fee added successfully.');
       setEditForm({
         hospital_id: '',
         department: '',
-        treatment_name: '',
+        treatment: null,
         min_price: 0,
         max_price: 0,
-        currency: 'USD',
-        unit: ''
+        currency: 'USD'
       });
       fetchFees();
 
@@ -162,7 +157,7 @@ export default function AdminFeesPage() {
   };
 
   const filteredFees = fees.filter(fee => {
-    const matchesSearch = fee.treatment_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = fee.treatment?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          fee.department?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          fee.hospital?.name?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesHospital = hospitalFilter === 'all' || fee.hospital_id === hospitalFilter;
@@ -261,8 +256,8 @@ export default function AdminFeesPage() {
                 <input
                   type="text"
                   placeholder="Treatment Name"
-                  value={editForm.treatment_name || ''}
-                  onChange={(e) => setEditForm(prev => ({ ...prev, treatment_name: e.target.value }))}
+                  value={editForm.treatment || ''}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, treatment: e.target.value }))}
                   className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#A8E6CF] focus:ring-2 focus:ring-[#A8E6CF]/20"
                 />
                 <select
@@ -291,13 +286,13 @@ export default function AdminFeesPage() {
                 <input
                   type="text"
                   placeholder="Duration (e.g., 30min, 1hr)"
-                  value={editForm.unit || ''}
-                  onChange={(e) => setEditForm(prev => ({ ...prev, unit: e.target.value }))}
+                  value={editForm.duration || ''}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, duration: e.target.value }))}
                   className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-[#A8E6CF] focus:ring-2 focus:ring-[#A8E6CF]/20"
                 />
                 <button
                   onClick={handleAddFee}
-                  disabled={!editForm.hospital_id || !editForm.treatment_name}
+                  disabled={!editForm.hospital_id || !editForm.treatment}
                   className="px-6 py-2 bg-[#A8E6CF] text-white rounded-xl font-medium hover:bg-[#8DD5B8] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Add
@@ -394,13 +389,13 @@ export default function AdminFeesPage() {
                               {editingFee === fee.id ? (
                                 <input
                                   type="text"
-                                  value={editForm.treatment_name || ''}
-                                  onChange={(e) => setEditForm(prev => ({ ...prev, treatment_name: e.target.value }))}
+                                  value={editForm.treatment || ''}
+                                  onChange={(e) => setEditForm(prev => ({ ...prev, treatment: e.target.value }))}
                                   className="px-2 py-1 border border-gray-200 rounded focus:outline-none focus:border-[#A8E6CF]"
                                   placeholder="Treatment Name"
                                 />
                               ) : (
-                                fee.treatment_name || '-'
+                                fee.treatment || '-'
                               )}
                             </div>
                           </div>
@@ -450,13 +445,13 @@ export default function AdminFeesPage() {
                             {editingFee === fee.id ? (
                               <input
                                 type="text"
-                                value={editForm.unit || ''}
-                                onChange={(e) => setEditForm(prev => ({ ...prev, unit: e.target.value }))}
+                                value={editForm.duration || ''}
+                                onChange={(e) => setEditForm(prev => ({ ...prev, duration: e.target.value }))}
                                 className="px-2 py-1 border border-gray-200 rounded focus:outline-none focus:border-[#A8E6CF]"
                                 placeholder="Duration"
                               />
                             ) : (
-                              fee.unit || '-'
+                              fee.duration || '-'
                             )}
                           </div>
                         </td>

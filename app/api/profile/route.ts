@@ -11,8 +11,8 @@ export async function POST(request: Request) {
 
     const admin = createServerClient()
     // Upsert profile row with service role to bypass RLS safely
-    const { data, error } = await admin
-      .from('users')
+    const { data, error } = await (admin
+      .from('users') as any)
       .upsert({ id, email, name, phone: phone || '', role, avatar_url }, { onConflict: 'id' })
       .select('*')
       .single()

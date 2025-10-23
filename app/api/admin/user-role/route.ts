@@ -19,8 +19,8 @@ export async function POST(request: Request) {
     const admin = createServerClient()
 
     // 1) Try to get user id from public.users by email (bypass RLS via service role)
-    const { data: profile, error: profileErr } = await admin
-      .from('users')
+    const { data: profile, error: profileErr } = await (admin
+      .from('users') as any)
       .select('id, email')
       .eq('email', email)
       .maybeSingle()
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: profileErr.message }, { status: 400 })
     }
 
-    let userId: string | null = profile?.id ?? null
+    let userId: string | null = (profile as any)?.id ?? null
 
     // 2) If not found in public.users, fall back to listing auth users and find by email
     if (!userId) {
@@ -55,8 +55,8 @@ export async function POST(request: Request) {
     }
 
     // 4) Sync public.users profile safely: update if exists else insert with safe defaults
-    const { data: existingProfile, error: existingErr } = await admin
-      .from('users')
+    const { data: existingProfile, error: existingErr } = await (admin
+      .from('users') as any)
       .select('id')
       .eq('id', userId)
       .maybeSingle()
@@ -65,9 +65,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: existingErr.message }, { status: 400 })
     }
 
-    if (existingProfile?.id) {
-      const { error: updateProfileErr } = await admin
-        .from('users')
+    if ((existingProfile as any)?.id) {
+      const { error: updateProfileErr } = await (admin
+        .from('users') as any)
         .update({ role })
         .eq('id', userId)
 
@@ -77,7 +77,7 @@ export async function POST(request: Request) {
     }
 
     // If profile does not exist, skip insert to avoid password_hash constraint; it will be created on first login.
-    return NextResponse.json({ success: true, userId, profileUpdated: !!existingProfile?.id })
+    return NextResponse.json({ success: true, userId, profileUpdated: !!(existingProfile as any)?.id })
   } catch (err: any) {
     return NextResponse.json({ error: err.message || 'Failed to update user role' }, { status: 500 })
   }

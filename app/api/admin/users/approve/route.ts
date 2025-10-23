@@ -9,8 +9,8 @@ export async function POST(request: Request) {
     const admin = createServerClient()
 
     // Set role=interpreter and status=active
-    const { error: profErr } = await admin
-      .from('profiles')
+    const { error: profErr } = await (admin
+      .from('profiles') as any)
       .update({ role: 'interpreter', status: 'active' })
       .eq('id', id)
     if (profErr) return NextResponse.json({ error: profErr.message }, { status: 400 })

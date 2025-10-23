@@ -9,12 +9,12 @@ export async function GET() {
     if (authErr) return NextResponse.json({ error: authErr.message }, { status: 400 })
 
     // 2) Fetch public profiles
-    const { data: profiles, error: profErr } = await admin
-      .from('profiles')
+    const { data: profiles, error: profErr } = await (admin
+      .from('profiles') as any)
       .select('*')
     if (profErr) return NextResponse.json({ error: profErr.message }, { status: 400 })
 
-    const idToProfile = new Map<string, any>((profiles || []).map(p => [p.id, p]))
+    const idToProfile = new Map<string, any>(((profiles as any[]) || []).map(p => [p.id, p]))
 
     // 3) Merge: union of auth.users and public.users (profiles)
     const authUsers = (authList?.users || []).map(u => {
@@ -31,9 +31,9 @@ export async function GET() {
     })
 
     const authIdSet = new Set<string>(authUsers.map(u => u.id))
-    const profileOnlyUsers = (profiles || [])
-      .filter(p => !authIdSet.has(p.id))
-      .map(p => ({
+    const profileOnlyUsers = ((profiles as any[]) || [])
+      .filter((p: any) => !authIdSet.has(p.id))
+      .map((p: any) => ({
         id: p.id,
         email: p.email,
         role: p.role || 'user',

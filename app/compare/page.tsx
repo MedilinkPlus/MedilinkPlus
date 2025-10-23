@@ -35,18 +35,18 @@ export default function ComparePage() {
   const hospitalName = (id: string) => hospitals.find(h => h.id === id)?.name || 'Unknown Hospital';
 
   const uniqueTreatments = useMemo(() => {
-    return [...new Set(fees.map(fee => fee.treatment_name))];
+    return [...new Set(fees.map(fee => fee.treatment))];
   }, [fees]);
 
   const comparisonData = useMemo(() => {
     if (!selectedTreatment) return [] as Fee[];
-    return fees.filter(fee => fee.treatment_name === selectedTreatment);
+    return fees.filter(fee => fee.treatment === selectedTreatment);
   }, [fees, selectedTreatment]);
 
   const filteredFees = useMemo(() => {
     return fees.filter(fee =>
       hospitalName(fee.hospital_id).toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (fee.treatment_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (fee.treatment || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (fee.department || '').toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [fees, hospitals, searchTerm]);
@@ -126,8 +126,8 @@ export default function ComparePage() {
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#A8E6CF] focus:border-transparent text-sm pr-8"
                 >
                   <option value="">Select treatment to compare</option>
-                  {uniqueTreatments.map((treatment) => (
-                    <option key={treatment} value={treatment}>
+                  {uniqueTreatments.filter(t => t).map((treatment) => (
+                    <option key={treatment} value={treatment || ''}>
                       {treatment}
                     </option>
                   ))}
@@ -142,14 +142,14 @@ export default function ComparePage() {
             <div className="bg-white rounded-2xl p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {uniqueTreatments.map((treatment) => {
-                  const treatmentFees = fees.filter(fee => fee.treatment_name === treatment);
+                  const treatmentFees = fees.filter(fee => fee.treatment === treatment);
                   const treatmentCount = treatmentFees.length;
                   const minPrice = Math.min(...treatmentFees.map(fee => fee.min_price));
 
                   return (
                     <div
                       key={treatment}
-                      onClick={() => setSelectedTreatment(treatment)}
+                      onClick={() => setSelectedTreatment(treatment || '')}
                       className="border border-gray-200 rounded-xl p-4 cursor-pointer hover:border-[#A8E6CF] hover:shadow-md transition-all"
                     >
                       <div className="flex items-center justify-between mb-3">

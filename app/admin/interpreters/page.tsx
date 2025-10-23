@@ -15,7 +15,7 @@ import { supabase } from '@/supabase/supabaseClient';
 import type { Tables } from '@/types/supabase';
 
 interface InterpreterWithUser extends Tables<'interpreters'> {
-  user?: Tables<'users'>;
+  profiles?: Tables<'profiles'>;
 }
 
 export default function AdminInterpretersPage() {
@@ -46,7 +46,7 @@ export default function AdminInterpretersPage() {
         .from('interpreters')
         .select(`
           *,
-          user (*)
+          profiles (*)
         `)
         .order('created_at', { ascending: false });
 
@@ -88,7 +88,7 @@ export default function AdminInterpretersPage() {
       // 사용자 이름 업데이트
       if (editingInterpreter.user_id) {
         const { error: userUpdateError } = await (supabase as any)
-          .from('users')
+          .from('profiles')
           .update({
             name: values.name,
             updated_at: new Date().toISOString()
@@ -142,7 +142,7 @@ export default function AdminInterpretersPage() {
 
 
   const filteredInterpreters = interpreters.filter(interpreter => {
-    const matchesSearch = interpreter.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = interpreter.profiles?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          interpreter.specializations?.some(s => s.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesSpecialization = specializationFilter === 'all' ||
                                   interpreter.specializations?.includes(specializationFilter);
@@ -176,10 +176,10 @@ export default function AdminInterpretersPage() {
           </div>
           <div>
             <div className="text-sm font-medium text-gray-900">
-              {interpreter.user?.name || '이름 없음'}
+              {interpreter.profiles?.name || '이름 없음'}
             </div>
             <div className="text-sm text-gray-500">
-              {interpreter.user?.email}
+              {interpreter.profiles?.email}
             </div>
           </div>
         </div>
@@ -438,7 +438,7 @@ export default function AdminInterpretersPage() {
           title="통역사 정보 수정"
           fields={editFormFields}
           initialValues={{
-            name: editingInterpreter?.user?.name || '',
+            name: editingInterpreter?.profiles?.name || '',
             specializations: editingInterpreter?.specializations?.join(', ') || '',
             experience_years: editingInterpreter?.experience_years || 0,
 
@@ -455,7 +455,7 @@ export default function AdminInterpretersPage() {
           onClose={() => setShowDeleteModal(false)}
           onConfirm={confirmDelete}
           title="통역사 삭제"
-          message={`정말로 "${deletingInterpreter?.user?.name}" 통역사를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`}
+          message={`정말로 "${deletingInterpreter?.profiles?.name}" 통역사를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`}
           confirmText="삭제"
           cancelText="취소"
           type="danger"
