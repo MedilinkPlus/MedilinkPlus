@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { supabase } from '@/supabase/supabaseClient';
+import { uploadPublicImage } from '@/services/storageService';
 import { LoadingSpinner } from '@/components/system/LoadingSpinner';
 import { ErrorMessage } from '@/components/system/ErrorMessage';
 
@@ -37,27 +38,8 @@ export default function ProfileImageUpload({ currentImageUrl, onImageUpload }: P
     setError('');
 
     try {
-      // 파일명 생성 (고유성 보장)
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `profile-images/${fileName}`;
-
-      // Supabase Storage에 업로드
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
-
-      if (uploadError) {
-        throw uploadError;
-      }
-
-      // 공개 URL 생성
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
+      // storageService를 사용하여 이미지 업로드
+      const publicUrl = await uploadPublicImage(file, 'profile-images');
 
       // 프로필 업데이트
       await onImageUpload(publicUrl);

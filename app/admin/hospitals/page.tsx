@@ -14,13 +14,15 @@ import { uploadPublicImage } from '@/services/storageService';
 type HospitalRow = {
   id: string
   name: string
-  code?: string
+  specialty?: string
+  address?: string
   phone?: string
-  email?: string
-  logo_url?: string
+  website?: string
+  hours?: string
+  image_url?: string
   status?: string
-  city?: string
-  country_code?: string
+  rating?: number
+  total_reservations?: number
 }
 
 type HospitalForm = Partial<HospitalRow> & {
@@ -39,7 +41,7 @@ export default function AdminHospitalsPage() {
   const filtered = useMemo(() => {
     return items
       .filter(h => statusFilter === 'all' ? true : (h.status || 'active') === statusFilter)
-      .filter(h => !searchTerm ? true : (h.name?.toLowerCase().includes(searchTerm.toLowerCase()) || (h.code || '').toLowerCase().includes(searchTerm.toLowerCase())))
+      .filter(h => !searchTerm ? true : (h.name?.toLowerCase().includes(searchTerm.toLowerCase()) || (h.specialty || '').toLowerCase().includes(searchTerm.toLowerCase())))
   }, [items, statusFilter, searchTerm])
 
   const load = async () => {
@@ -57,13 +59,13 @@ export default function AdminHospitalsPage() {
   }, [])
 
   const columns: AdminTableColumn<HospitalRow>[] = [
-    { key: 'logo', header: '', render: (h) => h.logo_url ? <img src={h.logo_url} alt="logo" className="w-8 h-8 rounded" /> : <div className="w-8 h-8 bg-gray-100 rounded" /> },
+    { key: 'image', header: '', render: (h) => h.image_url ? <img src={h.image_url} alt="hospital" className="w-8 h-8 rounded" /> : <div className="w-8 h-8 bg-gray-100 rounded" /> },
     { key: 'name', header: 'Name', render: (h) => <span className="font-medium">{h.name}</span> },
-    { key: 'code', header: 'Code', render: (h) => <span>{h.code || '-'}</span> },
+    { key: 'specialty', header: 'Specialty', render: (h) => <span>{h.specialty || '-'}</span> },
     { key: 'phone', header: 'Phone', render: (h) => <span>{h.phone || '-'}</span> },
-    { key: 'email', header: 'Email', render: (h) => <span>{h.email || '-'}</span> },
+    { key: 'website', header: 'Website', render: (h) => <span>{h.website || '-'}</span> },
     { key: 'status', header: 'Status', render: (h) => <span className={`text-xs px-2 py-1 rounded ${h.status === 'inactive' ? 'bg-gray-100 text-gray-600' : 'bg-green-100 text-green-700'}`}>{h.status || 'active'}</span> },
-    { key: 'location', header: 'Location', render: (h) => <span>{[h.city, h.country_code].filter(Boolean).join(', ') || '-'}</span> },
+    { key: 'rating', header: 'Rating', render: (h) => <span>{h.rating ? h.rating.toFixed(1) : '-'}</span> },
   ]
 
   const filterOptions = [
@@ -81,7 +83,7 @@ export default function AdminHospitalsPage() {
   ]
 
   const openCreate = () => {
-    setEditing({ name: '', code: '', phone: '', email: '', status: 'active', logo_url: '' })
+    setEditing({ name: '', specialty: '', address: '', phone: '', website: '', hours: '', status: 'active', image_url: '' })
     setShowEditModal(true)
   }
 
@@ -89,10 +91,12 @@ export default function AdminHospitalsPage() {
     setEditing({
       id: row.id,
       name: row.name,
-      code: row.code,
+      specialty: row.specialty,
+      address: row.address,
       phone: row.phone,
-      email: row.email,
-      logo_url: row.logo_url,
+      website: row.website,
+      hours: row.hours,
+      image_url: row.image_url,
       status: row.status as any
     })
     setShowEditModal(true)
@@ -102,9 +106,9 @@ export default function AdminHospitalsPage() {
     if (!values.name) throw new Error('Name is required')
     setLoading(true)
     try {
-      let imageUrl = values.image_url || values.logo_url
-      if (values.logo_url instanceof File) {
-        imageUrl = await uploadPublicImage(values.logo_url, 'hospitals')
+      let imageUrl = values.image_url
+      if (values.image_url instanceof File) {
+        imageUrl = await uploadPublicImage(values.image_url, 'hospitals')
       }
       if (values.id) {
         const updated = await HospitalService.updateHospital(values.id, {
@@ -157,7 +161,7 @@ export default function AdminHospitalsPage() {
     { name: 'phone', label: 'Phone', type: 'text' },
     { name: 'website', label: 'Website', type: 'text' },
     { name: 'hours', label: 'Hours', type: 'text' },
-    { name: 'logo_url', label: 'Image', type: 'file' },
+    { name: 'image_url', label: 'Image', type: 'file' },
     { name: 'status', label: 'Status', type: 'select', options: [
       { value: 'active', label: 'Active' },
       { value: 'inactive', label: 'Inactive' },
@@ -184,7 +188,7 @@ export default function AdminHospitalsPage() {
             <SearchFilter
               searchTerm={searchTerm}
               onSearchChange={setSearchTerm}
-              searchPlaceholder="Search by name or code..."
+              searchPlaceholder="Search by name or specialty..."
               filters={filterOptions as any}
             />
           </div>

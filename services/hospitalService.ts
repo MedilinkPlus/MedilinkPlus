@@ -92,17 +92,25 @@ export class HospitalService {
   // 병원 수정 (관리자용)
   static async updateHospital(id: string, updateData: Updates<'hospitals'>) {
     try {
-      const { data, error } = await (supabase
-        .from('hospitals') as any)
+      // 먼저 업데이트 실행
+      const { error: updateError } = await supabase
+        .from('hospitals')
         .update({
           ...updateData,
           updated_at: new Date().toISOString()
-        } as any)
+        })
         .eq('id', id)
-        .select()
+
+      if (updateError) throw updateError
+
+      // 업데이트된 데이터 조회
+      const { data, error: selectError } = await supabase
+        .from('hospitals')
+        .select('*')
+        .eq('id', id)
         .single()
 
-      if (error) throw error
+      if (selectError) throw selectError
       if (!data) throw new Error('병원을 찾을 수 없습니다.')
 
       return data
@@ -114,17 +122,25 @@ export class HospitalService {
   // 병원 삭제 (관리자용 - 상태 변경)
   static async deleteHospital(id: string) {
     try {
-      const { data, error } = await (supabase
-        .from('hospitals') as any)
+      // 먼저 상태 업데이트
+      const { error: updateError } = await supabase
+        .from('hospitals')
         .update({ 
           status: 'inactive',
           updated_at: new Date().toISOString()
-        } as any)
+        })
         .eq('id', id)
-        .select()
+
+      if (updateError) throw updateError
+
+      // 업데이트된 데이터 조회
+      const { data, error: selectError } = await supabase
+        .from('hospitals')
+        .select('*')
+        .eq('id', id)
         .single()
 
-      if (error) throw error
+      if (selectError) throw selectError
       if (!data) throw new Error('병원을 찾을 수 없습니다.')
 
       return data

@@ -113,7 +113,7 @@ export function useInterpreters(options: UseInterpretersOptions = {}): UseInterp
     } finally {
       setLoading(false)
     }
-  }, [page, limit, currentFilters])
+  }, [page, limit, currentFilters.specialtyFilter, currentFilters.minRating, currentFilters.minExperience])
 
   const searchInterpreters = useCallback(async (searchTerm: string) => {
     if (!searchTerm.trim()) {
@@ -168,67 +168,11 @@ export function useInterpreters(options: UseInterpretersOptions = {}): UseInterp
   }, [limit])
 
   const filterInterpreters = useCallback(async (filters: Partial<UseInterpretersOptions>) => {
-    try {
-      setLoading(true)
-      setError(null)
-      
-      const newFilters = { ...currentFilters, ...filters }
-      setCurrentFilters(newFilters)
-      setPage(1)
-      
-      let query = supabase
-        .from('interpreters')
-        .select(`
-          *,
-          users!inner(
-            id,
-            name,
-            email,
-            phone,
-            avatar_url
-          )
-        `)
-        .eq('status', 'active')
-        .range(0, limit - 1)
-
-      // 필터 적용
-      if (newFilters.specialtyFilter) {
-        query = query.contains('specialties', [newFilters.specialtyFilter])
-      }
-      
-      if (newFilters.minRating > 0) {
-        query = query.gte('rating', newFilters.minRating)
-      }
-      
-      if (newFilters.minExperience > 0) {
-        query = query.gte('experience_years', newFilters.minExperience)
-      }
-
-      const { data, error: filterError, count } = await query
-
-      if (filterError) throw filterError
-
-      const combinedInterpreters = data?.map(interpreter => {
-        const base = (interpreter || {}) as any
-        return {
-          ...base,
-          name: base.users?.name || 'Unknown',
-          email: base.users?.email || '',
-          phone: base.users?.phone || '',
-          avatar_url: base.users?.avatar_url || ''
-        }
-      }) || []
-
-      setInterpreters(combinedInterpreters)
-      setTotal(count || 0)
-      setTotalPages(Math.ceil((count || 0) / limit))
-    } catch (err: any) {
-      const domainError = handleSupabaseError(err)
-      setError(domainError.message)
-    } finally {
-      setLoading(false)
-    }
-  }, [currentFilters, limit])
+    const newFilters = { ...currentFilters, ...filters }
+    setCurrentFilters(newFilters)
+    setPage(1)
+    // fetchInterpreters는 useEffect에서 자동으로 호출됨
+  }, [currentFilters])
 
   const clearFilters = useCallback(() => {
     setCurrentFilters({
@@ -239,6 +183,7 @@ export function useInterpreters(options: UseInterpretersOptions = {}): UseInterp
     })
     setPage(1)
     setIsSearching(false)
+    // fetchInterpreters는 useEffect에서 자동으로 호출됨
   }, [])
 
   const fetchNextPage = useCallback(async () => {
@@ -259,19 +204,12 @@ export function useInterpreters(options: UseInterpretersOptions = {}): UseInterp
     }
   }, [totalPages])
 
-  // 페이지 변경 시 데이터 재로드
-  useEffect(() => {
-    if (page !== initialPage) {
-      fetchInterpreters()
-    }
-  }, [page, fetchInterpreters, initialPage])
-
-  // 초기 로딩
+  // 데이터 로딩
   useEffect(() => {
     if (autoFetch) {
       fetchInterpreters()
     }
-  }, [autoFetch, fetchInterpreters])
+  }, [fetchInterpreters, autoFetch])
 
   return {
     interpreters,
