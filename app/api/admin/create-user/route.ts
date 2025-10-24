@@ -17,16 +17,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid role' }, { status: 400 })
     }
 
-    const admin = createServerClient()
+    const supabase = createServerClient()
     // If the user already exists in Auth, reuse it (idempotent create)
     try {
-      const { data: list } = await admin.auth.admin.listUsers({ page: 1, perPage: 200 })
-      const existing = list?.users?.find(u => (u.email || '').toLowerCase() === email.toLowerCase())
+      const { data: list } = await (supabase as any).auth.admin.listUsers({ page: 1, perPage: 200 })
+      const existing = list?.users?.find((u: any) => (u.email || '').toLowerCase() === email.toLowerCase())
       if (existing) {
         // Ensure profile exists and return
         try {
-          await (admin
-            .from('profiles') as any)
+          await (supabase as any)
+            .from('profiles')
             .upsert({ 
               id: existing.id, 
               email, 
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
       }
     } catch {}
 
-    const { data, error } = await admin.auth.admin.createUser({
+    const { data, error } = await (supabase as any).auth.admin.createUser({
       email,
       password,
       email_confirm: true,
@@ -60,8 +60,8 @@ export async function POST(request: Request) {
 
     // Ensure app profile exists immediately (idempotent)
     try {
-      await (admin
-        .from('profiles') as any)
+      await (supabase as any)
+        .from('profiles')
         .upsert({
           id: data.user?.id,
           email,
