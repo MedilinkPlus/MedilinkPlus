@@ -15,10 +15,10 @@ import { supabase } from '@/supabase/supabaseClient';
 import type { Tables } from '@/types/supabase';
 
 interface ReservationWithDetails extends Tables<'reservations'> {
-  profiles?: Tables<'profiles'>;
+  users?: Tables<'users'>;
   hospital?: Tables<'hospitals'>;
   interpreter?: Tables<'interpreters'> & {
-    profiles?: Tables<'profiles'>;
+    users?: Tables<'users'>;
   };
 }
 
@@ -50,11 +50,11 @@ export default function AdminReservationsPage() {
         .from('reservations')
         .select(`
           *,
-          profiles!patient_id (*),
+          users!patient_id (*),
           hospitals!hospital_id (*),
           interpreters!interpreter_id (
             *,
-            profiles (*)
+            users (*)
           )
         `)
         .order('created_at', { ascending: false });
@@ -157,7 +157,7 @@ export default function AdminReservationsPage() {
 
   const filteredReservations = reservations.filter(reservation => {
     const matchesSearch = reservation.treatment?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         reservation.profiles?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         reservation.users?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          reservation.hospital?.name?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || reservation.status === statusFilter;
 
@@ -244,7 +244,7 @@ export default function AdminReservationsPage() {
       render: (reservation) => (
         <div>
           <div className="text-sm font-medium text-gray-900">
-            {reservation.profiles?.name || 'N/A'}
+            {reservation.users?.name || 'N/A'}
           </div>
           <div className="text-sm text-gray-500">
             {reservation.hospital?.name || 'N/A'}
@@ -258,7 +258,7 @@ export default function AdminReservationsPage() {
       render: (reservation) => (
         <div>
           <div className="text-sm text-gray-900">
-            {reservation.interpreter?.profiles?.name || '미배정'}
+            {reservation.interpreter?.users?.name || '미배정'}
           </div>
           {reservation.interpreter && (
             <div className="text-xs text-gray-500">

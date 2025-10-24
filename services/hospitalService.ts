@@ -93,7 +93,7 @@ export class HospitalService {
   static async updateHospital(id: string, updateData: Updates<'hospitals'>) {
     try {
       // 먼저 업데이트 실행
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from('hospitals')
         .update({
           ...updateData,
@@ -123,7 +123,7 @@ export class HospitalService {
   static async deleteHospital(id: string) {
     try {
       // 먼저 상태 업데이트
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from('hospitals')
         .update({ 
           status: 'inactive',

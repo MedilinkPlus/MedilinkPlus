@@ -9,6 +9,7 @@ import { ErrorMessage } from '@/components/system/ErrorMessage';
 import { SuccessMessage } from '@/components/system/SuccessMessage';
 import { FeeService, type Fee } from '@/services/feeService';
 import { HospitalService } from '@/services/hospitalService';
+import type { Hospital } from '@/types/supabase';
 
 interface FeeWithHospital extends Fee {
   hospital?: { id: string; name: string };
@@ -29,7 +30,8 @@ export default function AdminFeesPage() {
     treatment: null,
     min_price: 0,
     max_price: 0,
-    currency: 'USD'
+    currency: 'USD',
+    duration: ''
   });
 
   useEffect(() => {
@@ -43,16 +45,16 @@ export default function AdminFeesPage() {
       setError(null);
 
       const { fees: feesData } = await FeeService.list({ page: 1, limit: 1000 });
-      const { hospitals: hospitalsData } = await HospitalService.getHospitals(1, 1000) as any;
+      const { hospitals: hospitalsData } = await HospitalService.getHospitals(1, 1000);
       
       // Map fees with hospital names
-      const feesWithHospitals = feesData.map(fee => ({
+      const feesWithHospitals = feesData.map((fee: Fee) => ({
         ...fee,
         hospital: hospitalsData.find((h: any) => h.id === fee.hospital_id)
       }));
 
       setFees(feesWithHospitals);
-      setHospitals(hospitalsData.map((h: any) => ({ id: h.id, name: h.name })));
+      setHospitals(hospitalsData.map((h: Hospital) => ({ id: h.id, name: h.name })));
     } catch (err: any) {
       setError('Failed to load fee list.');
       console.error('Error fetching fees:', err);
@@ -63,8 +65,8 @@ export default function AdminFeesPage() {
 
   const fetchHospitals = async () => {
     try {
-      const { hospitals: hospitalsData } = await HospitalService.getHospitals(1, 1000) as any;
-      setHospitals(hospitalsData.map((h: any) => ({ id: h.id, name: h.name })));
+      const { hospitals: hospitalsData } = await HospitalService.getHospitals(1, 1000);
+      setHospitals(hospitalsData.map((h: Hospital) => ({ id: h.id, name: h.name })));
     } catch (err: any) {
       console.error('Error fetching hospitals:', err);
     }
@@ -78,7 +80,8 @@ export default function AdminFeesPage() {
       treatment: fee.treatment || null,
       min_price: fee.min_price || 0,
       max_price: fee.max_price || 0,
-      currency: fee.currency || 'USD'
+      currency: fee.currency || 'USD',
+      duration: fee.duration || ''
     });
   };
 
@@ -93,7 +96,8 @@ export default function AdminFeesPage() {
         treatment: editForm.treatment,
         min_price: editForm.min_price!,
         max_price: editForm.max_price,
-        currency: editForm.currency!
+        currency: editForm.currency!,
+        duration: editForm.duration
       });
 
       setSuccessMessage('Fee information updated successfully.');
@@ -135,7 +139,8 @@ export default function AdminFeesPage() {
         treatment: editForm.treatment!,
         min_price: editForm.min_price!,
         max_price: editForm.max_price,
-        currency: editForm.currency!
+        currency: editForm.currency!,
+        duration: editForm.duration
       });
 
       setSuccessMessage('New fee added successfully.');
@@ -145,7 +150,8 @@ export default function AdminFeesPage() {
         treatment: null,
         min_price: 0,
         max_price: 0,
-        currency: 'USD'
+        currency: 'USD',
+        duration: ''
       });
       fetchFees();
 

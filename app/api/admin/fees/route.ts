@@ -23,22 +23,24 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { hospital_id, department, treatment, fee, currency } = body
+    const { hospital_id, department, treatment, min_price, max_price, currency, duration } = body
 
-    if (!hospital_id || !department || !treatment || !fee) {
+    if (!hospital_id || !department || !treatment || !min_price) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
     const admin = createServerClient()
 
-    const { data, error } = await admin
+    const { data, error } = await (admin as any)
       .from('fees')
       .insert({
         hospital_id,
         department,
         treatment,
-        fee,
-        currency: currency || 'KRW'
+        min_price,
+        max_price,
+        currency: currency || 'USD',
+        duration
       })
       .select()
       .single()

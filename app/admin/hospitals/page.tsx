@@ -120,8 +120,8 @@ export default function AdminHospitalsPage() {
           hours: values.hours,
           image_url: imageUrl,
           status: values.status
-        } as any)
-        setItems(prev => prev.map(i => i.id === updated.id ? (updated as any) : i))
+        } as any) as HospitalRow
+        setItems(prev => prev.map(i => i.id === updated.id ? updated : i))
       } else {
         const created = await HospitalService.createHospital({
           name: values.name,
@@ -132,8 +132,8 @@ export default function AdminHospitalsPage() {
           hours: values.hours,
           image_url: imageUrl,
           status: values.status || 'active'
-        } as any)
-        setItems(prev => [created as any, ...prev])
+        } as any) as HospitalRow
+        setItems(prev => [created, ...prev])
       }
       setShowEditModal(false)
       setEditing(null)

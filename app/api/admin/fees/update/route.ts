@@ -10,7 +10,7 @@ export async function POST(request: Request) {
 
     const admin = createServerClient()
 
-    const { data, error } = await admin
+    const { data, error } = await (admin as any)
       .from('fees')
       .update(updates)
       .eq('id', id)
