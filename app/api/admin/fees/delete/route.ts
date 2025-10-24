@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
-import { createServerClient } from '@/supabase/supabaseClient'
+import { createClient } from '@supabase/supabase-js'
+import type { Database } from '@/types/supabase'
 
 export async function DELETE(request: Request) {
   try {
@@ -10,9 +11,22 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'Missing id' }, { status: 400 })
     }
 
-    const supabase = createServerClient()
+    // 환경 변수 확인
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-    const { error } = await (supabase as any)
+    if (!supabaseUrl || !serviceRoleKey) {
+      return NextResponse.json({ error: 'Missing Supabase configuration' }, { status: 500 })
+    }
+
+    const supabase = createClient<Database>(supabaseUrl, serviceRoleKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    })
+
+    const { error } = await supabase
       .from('fees')
       .delete()
       .eq('id', id)
