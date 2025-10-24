@@ -10,7 +10,7 @@ export async function DELETE(request: Request) {
 
     const admin = createServerClient()
 
-    const { error } = await admin
+    const { error } = await (admin as any)
       .from('fees')
       .delete()
       .eq('id', id)
