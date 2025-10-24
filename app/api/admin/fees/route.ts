@@ -4,9 +4,9 @@ import { createServerClient } from '@/supabase/supabaseClient'
 // GET: 모든 수수료 조회
 export async function GET() {
   try {
-    const admin = createServerClient()
+    const supabase = createServerClient()
     
-    const { data, error } = await admin
+    const { data, error } = await (supabase as any)
       .from('fees')
       .select('*')
       .order('created_at', { ascending: false })
@@ -29,9 +29,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    const admin = createServerClient()
+    const supabase = createServerClient()
 
-    const { data, error } = await (admin as any)
+    const { data, error } = await (supabase as any)
       .from('fees')
       .insert({
         hospital_id,

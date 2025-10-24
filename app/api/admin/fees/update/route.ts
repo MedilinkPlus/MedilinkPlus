@@ -8,9 +8,9 @@ export async function POST(request: Request) {
 
     if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
 
-    const admin = createServerClient()
+    const supabase = createServerClient()
 
-    const { data, error } = await (admin as any)
+    const { data, error } = await (supabase as any)
       .from('fees')
       .update(updates)
       .eq('id', id)
