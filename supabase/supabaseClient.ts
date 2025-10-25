@@ -34,6 +34,23 @@ export const createServerClient = () => {
   })
 }
 
+// Server-side Supabase client (anon key) - for read-only operations
+export const createServerAnonClient = () => {
+  const serverSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  
+  if (!serverSupabaseUrl || !anonKey) {
+    return null
+  }
+  
+  return createClient<Database>(serverSupabaseUrl, anonKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  })
+}
+
 // Type-safe table accessors with explicit typing
 export const getTable = <T extends keyof Database['public']['Tables']>(tableName: T) => {
   return supabase.from(tableName)
