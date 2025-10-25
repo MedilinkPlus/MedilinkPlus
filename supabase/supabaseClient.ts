@@ -19,12 +19,14 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
 
 // Server-side Supabase client (service role key) - for admin operations
 export const createServerClient = () => {
+  const serverSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!serviceRoleKey) {
-    throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY environment variable')
+  
+  if (!serverSupabaseUrl || !serviceRoleKey) {
+    throw new Error('Missing Supabase configuration')
   }
   
-  return createClient<Database>(supabaseUrl, serviceRoleKey, {
+  return createClient<Database>(serverSupabaseUrl, serviceRoleKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false
