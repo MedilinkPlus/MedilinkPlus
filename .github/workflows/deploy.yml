@@ -1,22 +1,20 @@
-name: Deploy to Vercel
+name: Deploy Next.js to GitHub Pages
 
 on:
   push:
     branches: [main]
-  workflow_dispatch:
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: '22'
       - run: npm ci
-      - uses: amondnet/vercel-action@v25
+      - run: npm run build
+      - uses: actions/upload-pages-artifact@v2
         with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: ./
+          path: ./out
+      - uses: actions/deploy-pages@v2
