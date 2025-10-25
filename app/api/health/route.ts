@@ -1,5 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/supabase/supabaseClient'
+import { createClient } from '@supabase/supabase-js'
+import type { Database } from '@/types/supabase'
+
+const getSupabaseClient = () => {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return null
+  }
+
+  return createClient<Database>(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  })
+}
 
 export async function GET(request: NextRequest) {
   const startTime = Date.now()
@@ -8,8 +25,13 @@ export async function GET(request: NextRequest) {
     // 데이터베이스 연결 상태 확인 (try health_check table)
     let dbError = null
     try {
-      const { error: err } = await supabase.from('health_check').select('status').limit(1)
-      dbError = err
+      const supabase = getSupabaseClient()
+      if (supabase) {
+        const { error: err } = await supabase.from('health_check').select('status').limit(1)
+        dbError = err
+      } else {
+        dbError = new Error('Supabase not configured')
+      }
     } catch (e: any) {
       dbError = e
     }
