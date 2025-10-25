@@ -3,6 +3,7 @@ name: Deploy Next.js to GitHub Pages
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
@@ -26,3 +27,5 @@ jobs:
         with:
           path: ./out
       - uses: actions/deploy-pages@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
