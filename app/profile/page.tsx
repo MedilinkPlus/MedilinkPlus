@@ -26,15 +26,15 @@ export default function ProfilePage() {
     try {
       const result = await updateProfile(updates);
       if (result.success) {
-        setSuccessMessage('프로필이 성공적으로 업데이트되었습니다.');
+        setSuccessMessage('Profile updated successfully.');
         setIsEditing(false);
         setTimeout(() => setSuccessMessage(''), 3000);
       } else {
-        setErrorMessage(result.error || '프로필 업데이트에 실패했습니다.');
+        setErrorMessage(result.error || 'Failed to update profile.');
         setTimeout(() => setErrorMessage(''), 5000);
       }
     } catch (err) {
-      setErrorMessage('예상치 못한 오류가 발생했습니다.');
+      setErrorMessage('An unexpected error occurred.');
       setTimeout(() => setErrorMessage(''), 5000);
     }
   };
@@ -49,7 +49,7 @@ export default function ProfilePage() {
         <div className="min-h-screen bg-gray-50 pb-20">
           <Header />
           <main className="pt-4">
-            <LoadingSpinner size="lg" text="프로필을 불러오는 중..." className="py-20" />
+            <LoadingSpinner size="lg" text="Loading profile..." className="py-20" />
           </main>
           <BottomNavigation />
         </div>
@@ -64,7 +64,7 @@ export default function ProfilePage() {
           <Header />
           <main className="pt-4">
             <div className="px-4">
-              <ErrorMessage error={error || '사용자 정보를 찾을 수 없습니다.'} />
+              <ErrorMessage error={error || 'User information not found.'} />
             </div>
           </main>
           <BottomNavigation />
@@ -80,8 +80,8 @@ export default function ProfilePage() {
         
         <main className="pt-4">
           <div className="px-4 mb-6">
-            <h1 className="text-2xl font-bold text-gray-800 mb-2">프로필</h1>
-            <p className="text-gray-600">개인정보를 관리하고 계정을 설정하세요</p>
+            <h1 className="text-2xl font-bold text-gray-800 mb-2">Profile</h1>
+            <p className="text-gray-600">Manage your personal information and account settings</p>
           </div>
 
           {/* 성공/에러 메시지 */}
@@ -119,7 +119,7 @@ export default function ProfilePage() {
                       : 'text-gray-600 hover:text-gray-800'
                   }`}
                 >
-                  기본 정보
+                  Profile Info
                 </button>
                 <button
                   onClick={() => setActiveTab('security')}
@@ -129,7 +129,7 @@ export default function ProfilePage() {
                       : 'text-gray-600 hover:text-gray-800'
                   }`}
                 >
-                  보안
+                  Security
                 </button>
               </div>
             </div>
@@ -162,29 +162,29 @@ export default function ProfilePage() {
           {/* 계정 정보 */}
           <div className="px-4 mt-6 mb-8">
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h3 className="text-lg font-bold text-gray-800 mb-4">계정 정보</h3>
+              <h3 className="text-lg font-bold text-gray-800 mb-4">Account Information</h3>
               <div className="space-y-3">
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-gray-600">계정 ID</span>
+                  <span className="text-gray-600">Account ID</span>
                   <span className="text-gray-800 font-mono text-sm">{user.id}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-gray-600">가입일</span>
+                  <span className="text-gray-600">Member Since</span>
                   <span className="text-gray-800">
-                    {new Date(user.created_at).toLocaleDateString('ko-KR')}
+                    {new Date(user.created_at).toLocaleDateString('en-US')}
                   </span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-gray-600">마지막 로그인</span>
+                  <span className="text-gray-600">Last Login</span>
                   <span className="text-gray-800">
                     {user.last_sign_in_at 
-                      ? new Date(user.last_sign_in_at).toLocaleDateString('ko-KR')
+                      ? new Date(user.last_sign_in_at).toLocaleDateString('en-US')
                       : 'N/A'
                     }
                   </span>
                 </div>
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-gray-600">계정 역할</span>
+                  <span className="text-gray-600">Account Role</span>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                     profile.role === 'admin' 
                       ? 'bg-red-100 text-red-600'
@@ -192,8 +192,8 @@ export default function ProfilePage() {
                       ? 'bg-[#FFD3B6] text-[#FF8A65]'
                       : 'bg-green-100 text-green-600'
                   }`}>
-                    {profile.role === 'admin' ? '관리자' : 
-                     profile.role === 'interpreter' ? '통역사' : '사용자'}
+                    {profile.role === 'admin' ? 'Admin' : 
+                     profile.role === 'interpreter' ? 'Interpreter' : 'User'}
                   </span>
                 </div>
               </div>

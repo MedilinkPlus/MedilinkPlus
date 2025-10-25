@@ -1,9 +1,26 @@
 import { NextResponse } from 'next/server'
-import { createServerClient } from '@/supabase/supabaseClient'
+import { createClient } from '@supabase/supabase-js'
+import type { Database } from '@/types/supabase'
+
+const getSupabaseClient = () => {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error('Missing Supabase configuration')
+  }
+
+  return createClient<Database>(supabaseUrl, serviceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  })
+}
 
 export async function GET() {
   try {
-    const admin = createServerClient()
+    const admin = getSupabaseClient()
     // 1) Fetch auth users
     const { data: authList, error: authErr } = await admin.auth.admin.listUsers({ page: 1, perPage: 200 })
     if (authErr) return NextResponse.json({ error: authErr.message }, { status: 400 })
