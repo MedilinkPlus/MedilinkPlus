@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
-import { createServerClient } from '@/supabase/supabaseClient'
+import { createClient } from '@supabase/supabase-js'
+import type { Database } from '@/types/supabase'
 
 export async function POST(request: Request) {
   try {
@@ -17,7 +18,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid role' }, { status: 400 })
     }
 
-    const supabase = createServerClient()
+    // 환경 변수 확인
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+    if (!supabaseUrl || !serviceRoleKey) {
+      return NextResponse.json({ error: 'Missing Supabase configuration' }, { status: 500 })
+    }
+
+    const supabase = createClient<Database>(supabaseUrl, serviceRoleKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    })
     // If the user already exists in Auth, reuse it (idempotent create)
     try {
       const { data: list } = await (supabase as any).auth.admin.listUsers({ page: 1, perPage: 200 })
