@@ -1,5 +1,22 @@
 import { NextResponse } from 'next/server'
-import { createServerClient } from '@/supabase/supabaseClient'
+import { createClient } from '@supabase/supabase-js'
+import type { Database } from '@/types/supabase'
+
+const getSupabaseClient = () => {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error('Missing Supabase configuration')
+  }
+
+  return createClient<Database>(supabaseUrl, serviceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  })
+}
 
 export async function DELETE(request: Request) {
   try {
@@ -7,7 +24,7 @@ export async function DELETE(request: Request) {
     const id = searchParams.get('id')
     if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
 
-    const admin = createServerClient()
+    const admin = getSupabaseClient()
 
     // 1) Delete from public.profiles first (if exists)
     let profileDeleted = false

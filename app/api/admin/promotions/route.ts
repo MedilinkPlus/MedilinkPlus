@@ -1,11 +1,28 @@
 import { NextResponse } from 'next/server'
-import { createServerClient } from '@/supabase/supabaseClient'
+import { createClient } from '@supabase/supabase-js'
+import type { Database } from '@/types/supabase'
+
+const getSupabaseClient = () => {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error('Missing Supabase configuration')
+  }
+
+  return createClient<Database>(supabaseUrl, serviceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  })
+}
 
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const admin = createServerClient()
-    const { data, error } = await (admin.from('promotions') as any).insert(body).select('*').single()
+    const supabase = getSupabaseClient()
+    const { data, error } = await (supabase.from('promotions') as any).insert(body).select('*').single()
     if (error) return NextResponse.json({ error: error.message }, { status: 400 })
     return NextResponse.json({ promotion: data })
   } catch (err: any) {
@@ -18,9 +35,9 @@ export async function PUT(request: Request) {
     const body = await request.json()
     const { id, ...updates } = body || {}
     if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
-    const admin = createServerClient()
+    const supabase = getSupabaseClient()
     // updated_at will be auto-updated by trigger
-    const { data, error } = await (admin.from('promotions') as any).update(updates).eq('id', id).select('*').single()
+    const { data, error } = await (supabase.from('promotions') as any).update(updates).eq('id', id).select('*').single()
     if (error) return NextResponse.json({ error: error.message }, { status: 400 })
     return NextResponse.json({ promotion: data })
   } catch (err: any) {
@@ -33,8 +50,8 @@ export async function DELETE(request: Request) {
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
     if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
-    const admin = createServerClient()
-    const { error } = await (admin.from('promotions') as any).delete().eq('id', id)
+    const supabase = getSupabaseClient()
+    const { error } = await (supabase.from('promotions') as any).delete().eq('id', id)
     if (error) return NextResponse.json({ error: error.message }, { status: 400 })
     return NextResponse.json({ success: true })
   } catch (err: any) {
