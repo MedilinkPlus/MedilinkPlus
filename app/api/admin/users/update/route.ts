@@ -42,14 +42,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Email is required to update profile' }, { status: 400 })
     }
 
-    // 3) Update public.users profile ONLY if it exists (avoid NOT NULL password_hash on insert)
+    // 3) Update public.profiles (users is a view, not the actual table)
     const updates: any = {}
     if (typeof name === 'string') updates.name = name
     if (typeof role === 'string') updates.role = role
     if (Object.keys(updates).length > 0) {
       updates.updated_at = new Date().toISOString()
       const { data, error: updErr } = await (admin
-        .from('users') as any)
+        .from('profiles') as any)
         .update(updates)
         .eq('id', id)
         .select()

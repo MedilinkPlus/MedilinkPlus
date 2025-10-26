@@ -18,9 +18,9 @@ export async function POST(request: Request) {
 
     const admin = createServerClient()
 
-    // 1) Try to get user id from public.users by email (bypass RLS via service role)
+    // 1) Try to get user id from public.profiles by email (bypass RLS via service role)
     const { data: profile, error: profileErr } = await (admin
-      .from('users') as any)
+      .from('profiles') as any)
       .select('id, email')
       .eq('email', email)
       .maybeSingle()
@@ -54,9 +54,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: updateAuthErr.message }, { status: 400 })
     }
 
-    // 4) Sync public.users profile safely: update if exists else insert with safe defaults
+    // 4) Sync public.profiles safely: update if exists else insert with safe defaults
     const { data: existingProfile, error: existingErr } = await (admin
-      .from('users') as any)
+      .from('profiles') as any)
       .select('id')
       .eq('id', userId)
       .maybeSingle()
@@ -67,7 +67,7 @@ export async function POST(request: Request) {
 
     if ((existingProfile as any)?.id) {
       const { error: updateProfileErr } = await (admin
-        .from('users') as any)
+        .from('profiles') as any)
         .update({ role })
         .eq('id', userId)
 

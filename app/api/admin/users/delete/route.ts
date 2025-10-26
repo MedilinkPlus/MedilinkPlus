@@ -9,14 +9,16 @@ export async function DELETE(request: Request) {
 
     const admin = createServerClient()
 
-    // 1) Delete from public.profiles first (if exists)
+    // 1) Delete from public.profiles (users is a view)
     let profileDeleted = false
     try {
       const { error: delProfileErr } = await admin.from('profiles').delete().eq('id', id)
       if (!delProfileErr || delProfileErr.code === 'PGRST116' || delProfileErr.message?.includes('0 rows')) {
         profileDeleted = true
       }
-    } catch {}
+    } catch (e) {
+      console.error('Error deleting profile:', e)
+    }
 
     // 2) Delete auth user (ignore if not found)
     let authDeleted = false
