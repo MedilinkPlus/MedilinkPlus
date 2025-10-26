@@ -113,6 +113,11 @@ export function useAuth(): UseAuthReturn {
       setError(null)
       setLoading(true)
 
+      // Get the site URL for email confirmation redirect
+      const siteUrl = typeof window !== 'undefined' 
+        ? window.location.origin 
+        : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+      
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
@@ -120,7 +125,8 @@ export function useAuth(): UseAuthReturn {
           data: {
             name,
             phone
-          }
+          },
+          emailRedirectTo: `${siteUrl}/auth/login`
         }
       })
 
