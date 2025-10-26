@@ -1,7 +1,8 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from 'next/navigation';
 import { LoadingSpinner } from '@/components/system/LoadingSpinner';
 import Link from 'next/link';
 
@@ -21,6 +22,18 @@ export default function RoleGuard({
   showLoading = true 
 }: RoleGuardProps) {
   const { user, profile, loading } = useAuth();
+  const router = useRouter();
+
+  // Redirect when not authenticated or lacking required role
+  useEffect(() => {
+    if (!loading) {
+      if (!user && redirectTo) {
+        router.push(redirectTo);
+      } else if (user && profile && redirectTo && !allowedRoles.includes(profile.role)) {
+        router.push(redirectTo);
+      }
+    }
+  }, [loading, user, profile, redirectTo, router, allowedRoles]);
 
   // Loading state
   if (loading && showLoading) {
@@ -79,7 +92,6 @@ export default function RoleGuard({
 
     if (redirectTo) {
       // Redirect when specified
-      window.location.href = redirectTo;
       return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <LoadingSpinner size="lg" text="Redirecting..." />
