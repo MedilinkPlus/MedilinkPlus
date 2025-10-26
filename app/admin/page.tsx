@@ -31,6 +31,13 @@ export default function AdminDashboard() {
 
   const quickActions = [
     { 
+      title: 'Price Comparison', 
+      description: 'Manage treatment fees and pricing', 
+      icon: 'ri-bar-chart-line',
+      color: 'bg-[#B8E6E3]',
+      href: '/admin/price-comparison'
+    },
+    { 
       title: 'User Management', 
       description: 'Manage user accounts and permissions', 
       icon: 'ri-user-settings-line',
@@ -57,13 +64,6 @@ export default function AdminDashboard() {
       icon: 'ri-calendar-line',
       color: 'bg-[#FFB6C1]',
       href: '/admin/reservations'
-    },
-    { 
-      title: 'Fee Management', 
-      description: 'Configure service fees', 
-      icon: 'ri-money-dollar-circle-line',
-      color: 'bg-[#98D8C8]',
-      href: '/admin/fees'
     },
     { 
       title: 'Promotion Management', 

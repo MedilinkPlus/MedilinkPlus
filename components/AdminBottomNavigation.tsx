@@ -9,10 +9,10 @@ export default function AdminBottomNavigation() {
 
   const navItems = [
     { href: '/admin', icon: 'ri-home-line', activeIcon: 'ri-home-fill', label: 'Home' },
+    { href: '/admin/price-comparison', icon: 'ri-bar-chart-line', activeIcon: 'ri-bar-chart-fill', label: 'Prices' },
     { href: '/admin/users', icon: 'ri-user-line', activeIcon: 'ri-user-fill', label: 'Users' },
     { href: '/admin/hospitals', icon: 'ri-hospital-line', activeIcon: 'ri-hospital-fill', label: 'Hospitals' },
-    { href: '/admin/reservations', icon: 'ri-calendar-line', activeIcon: 'ri-calendar-fill', label: 'Reservations' },
-    { href: '/admin/promotions', icon: 'ri-gift-line', activeIcon: 'ri-gift-fill', label: 'Promotions' },
+    { href: '/admin/reservations', icon: 'ri-calendar-line', activeIcon: 'ri-calendar-fill', label: 'Bookings' },
   ];
 
   return (
