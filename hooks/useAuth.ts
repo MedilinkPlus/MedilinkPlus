@@ -35,15 +35,17 @@ export function useAuth(): UseAuthReturn {
       if (profileError) throw profileError
       if (!data) {
         await createProfile(userId)
-        return
+        return null
       }
       setProfile(data)
+      return data
     } catch (err: any) {
       console.error('Error fetching profile:', err)
       // 안전망: 실패 시에도 프로필 생성 시도
       await createProfile(userId)
+      return null
     }
-  }, [])
+  }, [createProfile])
 
   // 새 프로필 생성
   const createProfile = useCallback(async (userId: string) => {
@@ -94,8 +96,8 @@ export function useAuth(): UseAuthReturn {
         // expose user to window for immediate redirect resolution
         try { (window as any).supabaseUser = data.user } catch {}
         // await profile fetch so role is available for redirect
-        await fetchProfile(data.user.id)
-        return { success: true }
+        const profileData = await fetchProfile(data.user.id)
+        return { success: true, profile: profileData }
       }
 
       return { success: false, error: 'Login failed' }

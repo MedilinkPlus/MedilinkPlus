@@ -77,17 +77,18 @@ export default function LoginPage() {
       
       if (result.success) {
         // 역할별 홈으로 리다이렉트
-        // profile이 이미 로드되어 있음 (signIn에서 await fetchProfile)
         const userWithRole = (window as any).supabaseUser || user;
-        const role = profile?.role || (userWithRole?.user_metadata as any)?.role;
         const email = (userWithRole?.email || '').toLowerCase();
+        // Get role from result.profile first, then fallback to state or metadata
+        const resultProfile = (result as any).profile;
+        const userRole = resultProfile?.role || profile?.role || (userWithRole?.user_metadata as any)?.role;
         
         let target = '/dashboard';
         if (email === 'ki.oksun@gmail.com') target = '/admin';
-        else if (role === 'admin') target = '/admin';
-        else if (role === 'interpreter') target = '/interpreter/dashboard';
+        else if (userRole === 'admin') target = '/admin';
+        else if (userRole === 'interpreter') target = '/interpreter/dashboard';
         
-        console.log('Redirecting to:', target, 'role:', role, 'profile role:', profile?.role);
+        console.log('Redirecting to:', target, 'email:', email, 'role:', userRole, 'resultProfile:', resultProfile);
         router.push(target);
       } else {
         setError(result.error || 'Login failed');
