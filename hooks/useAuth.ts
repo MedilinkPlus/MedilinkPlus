@@ -23,30 +23,6 @@ export function useAuth(): UseAuthReturn {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // 사용자 프로필 가져오기
-  const fetchProfile = useCallback(async (userId: string) => {
-    try {
-      const { data, error: profileError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', userId)
-        .maybeSingle()
-
-      if (profileError) throw profileError
-      if (!data) {
-        await createProfile(userId)
-        return null
-      }
-      setProfile(data)
-      return data
-    } catch (err: any) {
-      console.error('Error fetching profile:', err)
-      // 안전망: 실패 시에도 프로필 생성 시도
-      await createProfile(userId)
-      return null
-    }
-  }, [createProfile])
-
   // 새 프로필 생성
   const createProfile = useCallback(async (userId: string) => {
     try {
@@ -77,6 +53,30 @@ export function useAuth(): UseAuthReturn {
       console.error('Error creating profile:', err)
     }
   }, [])
+
+  // 사용자 프로필 가져오기
+  const fetchProfile = useCallback(async (userId: string) => {
+    try {
+      const { data, error: profileError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle()
+
+      if (profileError) throw profileError
+      if (!data) {
+        await createProfile(userId)
+        return null
+      }
+      setProfile(data)
+      return data
+    } catch (err: any) {
+      console.error('Error fetching profile:', err)
+      // 안전망: 실패 시에도 프로필 생성 시도
+      await createProfile(userId)
+      return null
+    }
+  }, [createProfile])
 
   // 로그인
   const signIn = useCallback(async (email: string, password: string) => {
