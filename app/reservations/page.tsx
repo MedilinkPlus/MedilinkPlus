@@ -32,7 +32,7 @@ export default function ReservationsPage() {
   const handleStatusChange = async (reservationId: string, newStatus: string) => {
     try {
       await changeStatus(reservationId, newStatus as any);
-      // 상태 변경 후 예약 목록 새로고침
+      // Refresh reservations after status change
       fetchReservations();
     } catch (err) {
       console.error('Status change error:', err);
@@ -41,8 +41,8 @@ export default function ReservationsPage() {
 
   const handleCancelReservation = async (reservationId: string) => {
     try {
-      await cancelReservation(reservationId, '사용자 요청으로 취소');
-      // 취소 후 예약 목록 새로고침
+      await cancelReservation(reservationId, 'Cancelled by user request');
+      // Refresh reservations after cancellation
       fetchReservations();
     } catch (err) {
       console.error('Cancel reservation error:', err);
@@ -59,7 +59,7 @@ export default function ReservationsPage() {
         <div className="min-h-screen bg-gray-50 pb-20">
           <Header />
           <main className="pt-4">
-            <LoadingSpinner size="lg" text="예약 정보를 불러오는 중..." className="py-20" />
+            <LoadingSpinner size="lg" text="Loading reservations..." className="py-20" />
           </main>
           <BottomNavigation />
         </div>
@@ -74,8 +74,8 @@ export default function ReservationsPage() {
         
         <main className="pt-4">
           <div className="px-4 mb-6">
-            <h1 className="text-2xl font-bold text-gray-800 mb-2">내 예약</h1>
-            <p className="text-gray-600">예약 현황을 확인하고 관리하세요</p>
+            <h1 className="text-2xl font-bold text-gray-800 mb-2">My Reservations</h1>
+            <p className="text-gray-600">View and manage your reservations</p>
           </div>
 
           {error && (
@@ -96,7 +96,7 @@ export default function ReservationsPage() {
                       : 'text-gray-600 hover:text-gray-800'
                   }`}
                 >
-                  전체 ({reservations?.length || 0})
+                  All ({reservations?.length || 0})
                 </button>
                 <button
                   onClick={() => setStatusFilter('pending')}
@@ -106,7 +106,7 @@ export default function ReservationsPage() {
                       : 'text-gray-600 hover:text-gray-800'
                   }`}
                 >
-                  대기중 ({getStatusCount('pending')})
+                  Pending ({getStatusCount('pending')})
                 </button>
                 <button
                   onClick={() => setStatusFilter('confirmed')}
@@ -116,7 +116,7 @@ export default function ReservationsPage() {
                       : 'text-gray-600 hover:text-gray-800'
                   }`}
                 >
-                  확정 ({getStatusCount('confirmed')})
+                  Confirmed ({getStatusCount('confirmed')})
                 </button>
                 <button
                   onClick={() => setStatusFilter('completed')}
@@ -126,7 +126,7 @@ export default function ReservationsPage() {
                       : 'text-gray-600 hover:text-gray-800'
                   }`}
                 >
-                  완료 ({getStatusCount('completed')})
+                  Completed ({getStatusCount('completed')})
                 </button>
               </div>
             </div>
@@ -153,15 +153,15 @@ export default function ReservationsPage() {
           {/* 새 예약 버튼 */}
           <div className="px-4 mt-8 mb-8">
             <div className="bg-gradient-to-r from-[#A8E6CF] to-[#FFD3B6] rounded-2xl p-6 text-center">
-              <h3 className="text-lg font-bold text-white mb-3">새로운 예약이 필요하신가요?</h3>
+              <h3 className="text-lg font-bold text-white mb-3">Need a new reservation?</h3>
               <p className="text-white/90 text-sm mb-4">
-                서울 최고의 병원에서 전문적인 의료 서비스를 받아보세요
+                Get professional medical services at Seoul's best hospitals
               </p>
               <a
                 href="/hospitals"
                 className="inline-block bg-white text-[#A8E6CF] px-6 py-3 rounded-xl font-medium hover:bg-gray-50 transition-colors"
               >
-                병원 찾기
+                Find Hospitals
               </a>
             </div>
           </div>
