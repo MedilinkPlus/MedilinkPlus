@@ -63,7 +63,7 @@ export default function AdminReservationsPage() {
 
       setReservations(data || []);
     } catch (err: any) {
-      setError('예약 목록을 불러오는데 실패했습니다.');
+      setError('Failed to load reservations.');
       console.error('Error fetching reservations:', err);
     } finally {
       setLoading(false);
@@ -91,14 +91,14 @@ export default function AdminReservationsPage() {
 
       if (updateError) throw updateError;
 
-      setSuccessMessage('예약 정보가 성공적으로 업데이트되었습니다.');
+      setSuccessMessage('Reservation updated successfully.');
       setShowEditModal(false);
       setEditingReservation(null);
       fetchReservations();
 
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err: any) {
-      setError('예약 정보 업데이트에 실패했습니다.');
+      setError('Failed to update reservation.');
       console.error('Error updating reservation:', err);
     }
   };
@@ -116,12 +116,12 @@ export default function AdminReservationsPage() {
 
       if (updateError) throw updateError;
 
-      setSuccessMessage('예약 상태가 성공적으로 변경되었습니다.');
+      setSuccessMessage('Reservation status changed successfully.');
       fetchReservations();
 
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err: any) {
-      setError('예약 상태 변경에 실패했습니다.');
+      setError('Failed to change reservation status.');
       console.error('Error updating reservation status:', err);
     }
   };
@@ -143,14 +143,14 @@ export default function AdminReservationsPage() {
 
       if (deleteError) throw deleteError;
 
-      setSuccessMessage('예약이 성공적으로 삭제되었습니다.');
+      setSuccessMessage('Reservation deleted successfully.');
       setShowDeleteModal(false);
       setDeletingReservation(null);
       fetchReservations();
 
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err: any) {
-      setError('예약 삭제에 실패했습니다.');
+      setError('Failed to delete reservation.');
       console.error('Error deleting reservation:', err);
     }
   };
@@ -191,10 +191,10 @@ export default function AdminReservationsPage() {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'pending': return '대기중';
-      case 'confirmed': return '확정';
-      case 'completed': return '완료';
-      case 'cancelled': return '취소';
+      case 'pending': return 'Pending';
+      case 'confirmed': return 'Confirmed';
+      case 'completed': return 'Completed';
+      case 'cancelled': return 'Cancelled';
       default: return status;
     }
   };
@@ -223,7 +223,7 @@ export default function AdminReservationsPage() {
   const columns: AdminTableColumn<ReservationWithDetails>[] = [
     {
       key: 'reservation',
-      header: '예약 정보',
+      header: 'Reservation',
       render: (reservation) => (
         <div>
           <div className="text-sm font-medium text-gray-900">
@@ -233,14 +233,14 @@ export default function AdminReservationsPage() {
             {new Date(reservation.date).toLocaleDateString('ko-KR')} {reservation.time}
           </div>
           <div className="text-xs text-gray-400">
-            예약 ID: {reservation.id.slice(0, 8)}...
+            ID: {reservation.id.slice(0, 8)}...
           </div>
         </div>
       )
     },
     {
       key: 'patient_hospital',
-      header: '환자/병원',
+      header: 'Patient/Hospital',
       render: (reservation) => (
         <div>
           <div className="text-sm font-medium text-gray-900">
@@ -254,11 +254,11 @@ export default function AdminReservationsPage() {
     },
     {
       key: 'interpreter',
-      header: '통역사',
+      header: 'Interpreter',
       render: (reservation) => (
         <div>
           <div className="text-sm text-gray-900">
-            {reservation.interpreter?.users?.name || '미배정'}
+            {reservation.interpreter?.users?.name || 'Unassigned'}
           </div>
           {reservation.interpreter && (
             <div className="text-xs text-gray-500">
@@ -270,7 +270,7 @@ export default function AdminReservationsPage() {
     },
     {
       key: 'status',
-      header: '상태',
+      header: 'Status',
       render: (reservation) => (
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(reservation.status)}`}>
           {getStatusText(reservation.status)}
@@ -279,34 +279,34 @@ export default function AdminReservationsPage() {
     },
     {
       key: 'actions',
-      header: '액션',
+      header: 'Actions',
       render: (reservation) => (
         <div className="flex flex-col space-y-2">
           <button
             onClick={() => handleEditReservation(reservation)}
             className="text-[#A8E6CF] hover:text-[#8DD5B8] transition-colors text-xs"
           >
-            수정
+            Edit
           </button>
           <button
             onClick={() => handleStatusChange(reservation.id, 'confirmed')}
             disabled={reservation.status === 'confirmed'}
             className="text-blue-600 hover:text-blue-800 transition-colors text-xs disabled:opacity-50"
           >
-            확정
+            Confirm
           </button>
           <button
             onClick={() => handleStatusChange(reservation.id, 'completed')}
             disabled={reservation.status === 'completed'}
             className="text-green-600 hover:text-green-800 transition-colors text-xs disabled:opacity-50"
           >
-            완료
+            Complete
           </button>
           <button
             onClick={() => handleDeleteReservation(reservation)}
             className="text-red-600 hover:text-red-800 transition-colors text-xs"
           >
-            삭제
+            Delete
           </button>
         </div>
       )
@@ -317,21 +317,21 @@ export default function AdminReservationsPage() {
   const editFormFields = [
     {
       name: 'status',
-      label: '상태',
+      label: 'Status',
       type: 'select' as const,
       options: [
-        { value: 'pending', label: '대기중' },
-        { value: 'confirmed', label: '확정' },
-        { value: 'completed', label: '완료' },
-        { value: 'cancelled', label: '취소' }
+        { value: 'pending', label: 'Pending' },
+        { value: 'confirmed', label: 'Confirmed' },
+        { value: 'completed', label: 'Completed' },
+        { value: 'cancelled', label: 'Cancelled' }
       ],
       required: true
     },
     {
       name: 'notes',
-      label: '메모',
+      label: 'Notes',
       type: 'textarea' as const,
-      placeholder: '예약에 대한 메모를 입력하세요',
+      placeholder: 'Enter notes for this reservation',
       required: false
     }
   ];
@@ -342,26 +342,26 @@ export default function AdminReservationsPage() {
       name: 'status',
       value: statusFilter,
       options: [
-        { value: 'all', label: '모든 상태' },
-        { value: 'pending', label: '대기중' },
-        { value: 'confirmed', label: '확정' },
-        { value: 'completed', label: '완료' },
-        { value: 'cancelled', label: '취소' }
+        { value: 'all', label: 'All Statuses' },
+        { value: 'pending', label: 'Pending' },
+        { value: 'confirmed', label: 'Confirmed' },
+        { value: 'completed', label: 'Completed' },
+        { value: 'cancelled', label: 'Cancelled' }
       ],
       onChange: setStatusFilter,
-      placeholder: '상태 선택'
+      placeholder: 'Select Status'
     },
     {
       name: 'date',
       value: dateFilter,
       options: [
-        { value: 'all', label: '모든 기간' },
-        { value: 'today', label: '오늘' },
-        { value: 'week', label: '이번 주' },
-        { value: 'month', label: '이번 달' }
+        { value: 'all', label: 'All Time' },
+        { value: 'today', label: 'Today' },
+        { value: 'week', label: 'This Week' },
+        { value: 'month', label: 'This Month' }
       ],
       onChange: setDateFilter,
-      placeholder: '기간 선택'
+      placeholder: 'Select Period'
     }
   ];
 
@@ -371,7 +371,7 @@ export default function AdminReservationsPage() {
         <div className="min-h-screen bg-gray-50 pb-20">
           <Header />
           <main className="pt-4">
-            <LoadingSpinner size="lg" text="예약 목록을 불러오는 중..." className="py-20" />
+            <LoadingSpinner size="lg" text="Loading reservations..." className="py-20" />
           </main>
           <AdminBottomNavigation />
         </div>
@@ -386,8 +386,8 @@ export default function AdminReservationsPage() {
         
         <main className="pt-4">
           <div className="px-4 mb-6">
-            <h1 className="text-2xl font-bold text-gray-800 mb-2">예약 관리</h1>
-            <p className="text-gray-600">전체 예약 현황을 모니터링하고 관리하세요</p>
+            <h1 className="text-2xl font-bold text-gray-800 mb-2">Reservation Management</h1>
+            <p className="text-gray-600">Monitor and manage all reservations</p>
           </div>
 
           {error && (
@@ -408,19 +408,19 @@ export default function AdminReservationsPage() {
               <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-[#A8E6CF]">{stats.total}</div>
-                  <div className="text-sm text-gray-600">전체 예약</div>
+                  <div className="text-sm text-gray-600">Total</div>
                 </div>
               </div>
               <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-[#FFD3B6]">{stats.thisMonth}</div>
-                  <div className="text-sm text-gray-600">이번 달</div>
+                  <div className="text-sm text-gray-600">This Month</div>
                 </div>
               </div>
               <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-[#E0BBE4]">{stats.pending}</div>
-                  <div className="text-sm text-gray-600">대기중</div>
+                  <div className="text-sm text-gray-600">Pending</div>
                 </div>
               </div>
             </div>
@@ -429,23 +429,23 @@ export default function AdminReservationsPage() {
           {/* 상태별 요약 */}
           <div className="px-4 mb-6">
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h3 className="text-lg font-bold text-gray-800 mb-4">예약 상태 요약</h3>
+              <h3 className="text-lg font-bold text-gray-800 mb-4">Status Summary</h3>
               <div className="grid grid-cols-4 gap-4">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
-                  <div className="text-sm text-gray-600">대기중</div>
+                  <div className="text-sm text-gray-600">Pending</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-blue-600">{stats.confirmed}</div>
-                  <div className="text-sm text-gray-600">확정</div>
+                  <div className="text-sm text-gray-600">Confirmed</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-green-600">{stats.completed}</div>
-                  <div className="text-sm text-gray-600">완료</div>
+                  <div className="text-sm text-gray-600">Completed</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-red-600">{stats.cancelled}</div>
-                  <div className="text-sm text-gray-600">취소</div>
+                  <div className="text-sm text-gray-600">Cancelled</div>
                 </div>
               </div>
             </div>
@@ -456,7 +456,7 @@ export default function AdminReservationsPage() {
             <SearchFilter
               searchTerm={searchTerm}
               onSearchChange={setSearchTerm}
-              searchPlaceholder="진료명, 환자명, 병원명으로 검색..."
+              searchPlaceholder="Search by treatment, patient, or hospital name..."
               filters={filterOptions}
             />
           </div>
@@ -467,7 +467,7 @@ export default function AdminReservationsPage() {
               data={filteredReservations}
               columns={columns}
               loading={loading}
-              emptyMessage="검색 조건에 맞는 예약이 없습니다."
+              emptyMessage="No reservations found matching your criteria."
               emptyIcon="ri-calendar-line"
             />
           </div>
@@ -480,14 +480,14 @@ export default function AdminReservationsPage() {
           isOpen={showEditModal}
           onClose={() => setShowEditModal(false)}
           onSave={handleSaveEdit}
-          title="예약 정보 수정"
+          title="Edit Reservation"
           fields={editFormFields}
           initialValues={{
             status: editingReservation?.status || 'pending',
             notes: editingReservation?.notes || ''
           }}
           loading={loading}
-          saveText="저장"
+          saveText="Save"
           size="md"
         />
 
@@ -496,10 +496,10 @@ export default function AdminReservationsPage() {
           isOpen={showDeleteModal}
           onClose={() => setShowDeleteModal(false)}
           onConfirm={confirmDelete}
-          title="예약 삭제"
-          message={`정말로 이 예약을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`}
-          confirmText="삭제"
-          cancelText="취소"
+          title="Delete Reservation"
+          message={`Are you sure you want to delete this reservation? This action cannot be undone.`}
+          confirmText="Delete"
+          cancelText="Cancel"
           type="danger"
           loading={loading}
         />
