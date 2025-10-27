@@ -93,7 +93,8 @@ export function useAuth(): UseAuthReturn {
         setUser(data.user)
         // expose user to window for immediate redirect resolution
         try { (window as any).supabaseUser = data.user } catch {}
-        fetchProfile(data.user.id).catch(() => {})
+        // await profile fetch so role is available for redirect
+        await fetchProfile(data.user.id)
         return { success: true }
       }
 

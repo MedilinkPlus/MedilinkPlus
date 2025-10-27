@@ -76,11 +76,8 @@ export default function LoginPage() {
       const result = await signIn(formData.email, formData.password);
       
       if (result.success) {
-        // 로그인 성공 시 profile이 로드될 때까지 잠시 대기
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
         // 역할별 홈으로 리다이렉트
-        // useAuth 내부에서 user 상태가 갱신되므로 최신 user를 사용
+        // profile이 이미 로드되어 있음 (signIn에서 await fetchProfile)
         const userWithRole = (window as any).supabaseUser || user;
         const role = profile?.role || (userWithRole?.user_metadata as any)?.role;
         const email = (userWithRole?.email || '').toLowerCase();
@@ -90,7 +87,7 @@ export default function LoginPage() {
         else if (role === 'admin') target = '/admin';
         else if (role === 'interpreter') target = '/interpreter/dashboard';
         
-        console.log('Redirecting to:', target, 'role:', role, 'profile:', profile);
+        console.log('Redirecting to:', target, 'role:', role, 'profile role:', profile?.role);
         router.push(target);
       } else {
         setError(result.error || 'Login failed');
